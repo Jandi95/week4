@@ -1,13 +1,5 @@
 # React + Supabase(auth, database) SPA 구현
 
-## 시작
-
-최소한의 라이브러리만을 활용하고자 마음 먹고 호기롭게 시작한다.  
-가능하다면 재활용될 커스텀 훅들을 직접 제작해 활용하고자 하고,  
-어느정도 타협이 필요하다면 라이브러리를 추가하면서 진행해야겠다.
-
----
-
 ## 작업 계획
 
 1. 컴포넌트 구축 및 상태 설정
@@ -27,3 +19,38 @@
    - 글 작성 성공/실패 시, 토스트 알림
 
 ---
+
+## 시행착오와 해결과정
+
+### 1. 비밀번호와 비밀번호 확인의 동작 이슈
+
+- 문제 : `비밀번호`를 올바른 형식으로 입력하고 `비밀번호 확인`에서 같은 값으로 검증을 끝내고 다시 `비밀번호`를 수정하면 `비밀번호 확인` 필드를 건들지 않는 이상 에러가 작동하지 않았다.
+- 해결과정 : 사용한 라이브러리인 `react-hook-form`는 인풋 필드의 validate는 그 필드가 변경될 때만 실행된다는 것을 파악하고 `trigger` 라는 기능을 활용하여 해결해보고자 아래와 같이 코드를 작성했다.
+
+```Typescript
+const password = watch("password")
+
+useEffect(() => {
+  trigger("passwordAgain")
+}, [password, trigger])
+```
+
+문제 없이 잘 작동을 기대했지만 간과한점이 있었다.. 초기 화면부터 `비밀번호 확인` 필드에 아무것도 입력하지 않았다는 에러가 출력되고 있었다. 파악해보자면..
+
+1. trigger("passwordAgain") 호출 → 아직 아무 값도 안 넣었는데도 검증 실행
+2. 그래서 "패스워드 확인을 입력하세요." 에러가 초기 화면부터 뜸
+
+열심히 머리를 굴려본 결과 아래와 같은 코드가 나왔다.
+
+```Typescript
+const password = watch("password")
+const passwordAgain = watch("passwordAgain")
+
+useEffect(() => {
+  if (passwordAgain) {
+    trigger("passwordAgain")
+  }
+}, [password, passwordAgain, trigger])
+```
+
+`passwordAgain`을 `watch`하고 입력이 된 상태에서만 재검증되게 설정하여 해결했다.
