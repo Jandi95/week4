@@ -2,7 +2,7 @@
   "private": true,
   "type": "module",
   "name": "week4",
-  "description": "리액트 템플릿 (Bun + Vite + TypeScript)",
+  "description": "React + Supabase(auth, database) SPA 구현",
   "version": "1.2.0",
   "scripts": {
     "dev": "bunx --bun vite",

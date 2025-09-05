@@ -1,10 +1,38 @@
+* {
+  font-family:
+    'Pretendard Variable',
+    Pretendard,
+    -apple-system,
+    BlinkMacSystemFont,
+    system-ui,
+    Roboto,
+    'Helvetica Neue',
+    'Segoe UI',
+    'Apple SD Gothic Neo',
+    'Noto Sans KR',
+    'Malgun Gothic',
+    'Apple Color Emoji',
+    'Segoe UI Emoji',
+    'Segoe UI Symbol',
+    sans-serif;
+}
+
 body {
-  overflow-y: scroll;
-  min-block-size: 100dvh;
   margin: 0;
+  min-block-size: 100dvh;
+  background-color: #222;
+  color: #fff;
 }
 
 abbr[title] {
   cursor: help;
   text-decoration: none;
+}
+
+button {
+  cursor: pointer;
+
+  &:disabled {
+    cursor: default;
+  }
 }
