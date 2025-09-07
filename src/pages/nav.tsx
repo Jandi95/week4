@@ -1,7 +1,7 @@
 import NavLink, { NavItem } from '@/components/nav-link'
 import navSet from '@/utils/nav-set'
 
-export type Page = 'signin' | 'signup' | 'profile'
+export type Page = 'signin' | 'signup' | 'profile' | 'main'
 
 const PAGES_DEFAULT: NavItem[] = [
   { path: 'signup', text: 'Sign Up' },
