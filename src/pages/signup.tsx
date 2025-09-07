@@ -1,6 +1,9 @@
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
-import { FormButton, FormInput, Layout } from '@/components'
+import { toast } from 'sonner'
+import { FormButton, FormInput } from '@/components'
+import supabase from '@/libs/supabase'
+import navSet from '@/utils/nav-set'
 
 interface FormSignUp {
   name: string
@@ -16,8 +19,7 @@ export default function SignUp() {
     trigger,
     watch,
     formState: { errors, isSubmitting },
-    // handleSubmit,
-    // reset,
+    handleSubmit,
   } = useForm<FormSignUp>({
     mode: 'onChange',
   })
@@ -31,9 +33,46 @@ export default function SignUp() {
     }
   }, [password, passwordAgain, trigger])
 
+  const onSubmit = async (formData: FormSignUp) => {
+    if (isSubmitting) return
+
+    const { data, error } = await supabase.auth.signUp({
+      email: formData.email,
+      password: formData.password,
+      options: {
+        data: {
+          username: formData.name,
+        },
+      },
+    })
+
+    if (error) {
+      console.error(
+        `회원가입 실패, ${error.name}(${error.status}): ${error.message}`
+      )
+    } else {
+      if (data.user) {
+        const { error } = await supabase.from('profiles').insert({
+          id: data.user.id,
+          email: data.user.email,
+          username: data.user.user_metadata.username,
+          bio: data.user.user_metadata.bio,
+          created_at: new Date().toISOString(),
+        })
+
+        if (error) {
+          toast.error(`회원가입 실패, ${error.name}: ${error.message}`)
+        } else {
+          toast.success(`회원가입에 성공했습니다.`)
+          navSet('signin')
+        }
+      }
+    }
+  }
+
   return (
     <div className="max-w-[620px] mx-auto my-15 bg-[#292929] p-8">
-      <form>
+      <form onSubmit={handleSubmit(onSubmit)} autoComplete="off" noValidate>
         <div className="flex flex-col gap-14 mb-20">
           <FormInput
             label="이름"

@@ -1,5 +1,8 @@
 import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 import { FormButton, FormInput, Layout } from '@/components'
+import supabase from '@/libs/supabase'
+import navSet from '@/utils/nav-set'
 
 interface FormSignIn {
   email: string
@@ -10,15 +13,31 @@ export default function SignIn() {
   const {
     register,
     formState: { errors, isSubmitting },
-    // handleSubmit,
-    // reset,
+    handleSubmit,
   } = useForm<FormSignIn>({
     mode: 'onChange',
   })
 
+  const onSubmit = async (formData: FormSignIn) => {
+    if (isSubmitting) return
+
+    const { error, data } = await supabase.auth.signInWithPassword(formData)
+
+    if (error) {
+      toast.error(
+        `로그인 실패, ${error.name}(${error.status}: ${error.message})`
+      )
+    } else {
+      if (data.user) {
+        toast.success(`로그인 성공`)
+        navSet('main')
+      }
+    }
+  }
+
   return (
     <div className="max-w-[620px] mx-auto my-15 bg-[#292929] p-8">
-      <form>
+      <form onSubmit={handleSubmit(onSubmit)} autoComplete="off" noValidate>
         <div className="flex flex-col gap-14 mb-20">
           <FormInput
             label="이메일"
